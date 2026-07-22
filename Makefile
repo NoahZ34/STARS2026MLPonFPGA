@@ -142,10 +142,10 @@ $(BUILD)/$(FPGA_TOP).bin : $(BUILD)/$(FPGA_TOP).asc
 
 # Perform timing analysis on FPGA design
 time: $(BUILD)/$(FPGA_TOP).asc
-	# Re-synthesize
-	$(YOSYS) -p "read_verilog -sv -noblackbox $(ICE) $(UART) $(SRC)/*; synth_ice40 -top ice40hx8k -json $(BUILD)/$(FPGA_TOP).json"
-	# Place and route using nextpnr
-	$(NEXTPNR) --hx8k --package ct256 --placer-heap-cell-placement-timeout 0 --asc $(BUILD)/$(FPGA_TOP).asc --json $(BUILD)/$(FPGA_TOP).json 2> >(sed -e 's/^.* 0 errors$$//' -e '/^Info:/d' -e '/^[ ]*$$/d' 1>&2)
+	# Re-synthesize (Fix: Split synth and write_json to remove scopeinfo)
+	$(YOSYS) -p "read_verilog -sv -noblackbox $(ICE) $(UART) $(SRC)/*; synth_ice40 -top ice40hx8k; write_json -noscopeinfo $(BUILD)/$(FPGA_TOP).json"
+	# Place and route using nextpnr (Fix: Added --pcf pin mapping)
+	$(NEXTPNR) --hx8k --package ct256 --placer-heap-cell-placement-timeout 0 --pcf $(PINMAP) --asc $(BUILD)/$(FPGA_TOP).asc --json $(BUILD)/$(FPGA_TOP).json 2> >(sed -e 's/^.* 0 errors$$//' -e '/^Info:/d' -e '/^[ ]*$$/d' 1>&2)
 	icetime -tmd hx8k $(BUILD)/$(FPGA_TOP).asc
 
 
