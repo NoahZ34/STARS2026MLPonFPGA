@@ -51,7 +51,7 @@ module top (
   genvar i;
     generate
         for (i = 0; i < 4; i = i + 1) begin : gen_mac
-          MAC MAC_inst (.*,.n_rst(!reset),.MAC_in(MAC_in[8*i +:8]),.MAC_out(MAC_out[8*i +:8]),.MAC_outrelu(MAC_outrelu[4*i +:4]));
+			MAC MAC_inst (.*,.n_rst(!reset),.MAC_in(MAC_in[8*i +:8]),.MAC_out(MAC_out[16*i +:16]),.MAC_outrelu(MAC_outrelu[4*i +:4]));
         end
     endgenerate
   hidden_layer_buffer hlb1 (.*, .nrst(!reset),.wen(HLBwen),.ren(HLBren),.incr(HLBincr),.in(MAC_outrelu),.out(HLBrdata));
